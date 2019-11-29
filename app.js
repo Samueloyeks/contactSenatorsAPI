@@ -90,6 +90,8 @@ app.get('/senators', (req, res) => {
 
 },error=>{
   console.log(error)
+  res.send('Error!')
+
 })
 
 //get all states
@@ -103,18 +105,35 @@ connection.query(`SELECT * FROM states`,function (err,result,fields){
 
 },error=>{
   console.log(error)
+  res.send('Error!')
+
 })
 
 //delete senator
   app.delete('/senators/:id', (req, res) => { 
     connection.query('DELETE FROM senators where id=?',[req.params.id],(err,rows,fields)=>{
-      if(!err)
-      res.send('Deleted successfully!')
-      else
-      console.log(err)
+      if(!err){
+        let query = `SELECT  senators.id,senators.name,senators.phoneNumber,senators.email,states.state FROM senators LEFT JOIN states ON senators.state=states.id ORDER BY senators.id`
+        connection.query(query, function (err, result, fields) {
+          console.log('here again')
+          senators = result
+          console.log(senators)
+          res.send(senators)
+          if (err) {
+            console.log(err)
+            res.send('Error!')
+            throw err;
+          }
+        });
+      }
+      else{
+        res.send('Error!')
+      }
     })
   },error=>{
     console.log(error)
+    res.send('Error!')
+
   })
 
   //insert senator
@@ -124,21 +143,29 @@ connection.query(`SELECT * FROM states`,function (err,result,fields){
 CALL addEditSenator(@id,@name,@phoneNumber,@email,@state )";
     connection.query(sql,[sen.id,sen.name,sen.phoneNumber,sen.email,sen.state],(err,results,fields)=>{
       if(!err){
-        app.get('/senators', (req, res) => { 
-          res.send(senators)
-          console.log(senators)
-        
-        },error=>{
-          console.log(error)
-        })
+
+          let query = `SELECT  senators.id,senators.name,senators.phoneNumber,senators.email,states.state FROM senators LEFT JOIN states ON senators.state=states.id ORDER BY senators.id`
+          connection.query(query, function (err, result, fields) {
+            console.log('here again')
+            senators = result
+            console.log(senators)
+            res.send(senators)
+            if (err) {
+              console.log(err)
+              res.send('Error!')
+              throw err;
+            }
+          });
       }      
       else{
-        console.log(error);
-        
+        console.log(err);
+        res.send('Error!')
       }
     })
   },error=>{
     console.log(error)
+    res.send('Error!')
+
   })
 
 //send mail
@@ -150,6 +177,8 @@ app.post('/sendmail', (req, res) => {
   })
 },error=>{
   console.log(error)
+  res.send('Error!')
+
 })
 
 async function sendMail(user,callback){
