@@ -1,5 +1,5 @@
 {
-  "name": "y",
+  "name": "contactsenatorAPI",
   "version": "1.0.0",
   "description": "API for contactSenator app",
   "main": "app.js",
